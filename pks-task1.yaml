@@ -1,0 +1,38 @@
+name: PKS2022/23
+pcap_name: eth-8.pcap
+filter_name: ARP
+complete_comms:
+  - number_comm: 1
+    src_comm: 192.168.1.18
+    dst_comm: 192.168.1.11
+    packets:
+      - frame_number: 11
+        len_frame_pcap: 60
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:0F:3D:95:D9:99"
+        dst_mac: "00:A1:B0:08:01:AF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 192.168.1.18
+        dst_ip: 192.168.1.11
+        hexa_frame: |
+          00 a1 b0 08 01 af 00 0f 3d 95 d9 99 08 06 00 01
+          08 00 06 04 00 01 00 0f 3d 95 d9 99 c0 a8 01 12
+          00 00 00 00 00 00 c0 a8 01 0b 00 00 00 00 a0 54
+          00 00 a0 54 00 00 05 00 00 00 00 10
+      - frame_number: 12
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:A1:B0:08:01:AF"
+        dst_mac: "00:0F:3D:95:D9:99"
+        ether_type: ARP
+        arp_opcode: REPLY
+        src_ip: 192.168.1.11
+        dst_ip: 192.168.1.18
+        hexa_frame: |
+          00 0f 3d 95 d9 99 00 a1 b0 08 01 af 08 06 00 01
+          08 00 06 04 00 02 00 a1 b0 08 01 af c0 a8 01 0b
+          00 0f 3d 95 d9 99 c0 a8 01 12
+incomplete_comms: []
