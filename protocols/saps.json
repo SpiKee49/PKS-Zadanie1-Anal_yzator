@@ -1,1 +1,18 @@
-{"00": "Null SAP", "02": "LLC Sublayer Management / Individual", "03": "LLC Sublayer Management / Group", "06": "IP", "0e": "PROWAY Network Management, Maintenance and Installation", "42": "STP", "4e": "MMS", "5e": "ISI IP", "7e": "X.25 PLP", "8e": "PROWAY Active Station List Maintenance", "aa": "SNAP", "e0": "IPX", "f0": "NETBIOS", "f4": "LAN", "fe": "ISO", "ff": "DSAP"}
+{
+  "00": "Null SAP",
+  "02": "LLC Sublayer Management / Individual",
+  "03": "LLC Sublayer Management / Group",
+  "06": "IP",
+  "0e": "PROWAY Network Management, Maintenance and Installation",
+  "42": "STP",
+  "4e": "MMS",
+  "5e": "ISI IP",
+  "7e": "X.25 PLP",
+  "8e": "PROWAY Active Station List Maintenance",
+  "aa": "SNAP",
+  "e0": "IPX",
+  "f0": "NETBIOS",
+  "f4": "LAN",
+  "fe": "ISO",
+  "ff": "DSAP"
+}
