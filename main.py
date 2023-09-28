@@ -102,54 +102,55 @@ def getPid(hex):
 
 def analyzeArp(packets):
     complete_comms = []
-    incomplete_comms = []
+    partial_comms = []
+    passed_frame_numbers = []
     arp_packets = list(
         filter(lambda packet: packet['ether_type'] == 'ARP', packets))
     # get only ARP packets
 
-    for packet in arp_packets:
-        comm = {}
-        pair = {}
-        requests = []
+    for packet1 in arp_packets:
 
-        for item in arp_packets:
-            if (packet['src_ip'] != item['src_ip'] and
-                packet['dst_ip'] == item['dst_ip'] and
-                    item['arp_opcode'] == 'REQUEST'):
-                requests.append(item)
+        for packet2 in arp_packets:
+            if packet1['frame_number'] == packet2['frame_number']:
+                continue
 
-            if (item['src_ip'] == packet['dst_ip'] and
-                packet['src_ip'] == item['dst_ip'] and
-                packet['src_mac'] == item['dst_mac'] and
-                    item['arp_opcode'] == 'REPLY'):
-                pair = item
-                break
+            if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
+                comm = {}
+                if len(complete_comms) == 0:
+                    comm['number_comm'] = 1
+                    comm['src_comm'] = packet1["src_ip"]
+                    comm['dst_comm'] = packet1["dst_ip"]
+                    comm['packets'] = []
+                   
+                else:
+                    for complete_comm in complete_comms:
+                        if (complete_comm['src_comm'] == packet1['src_ip'] and complete_comm['dst_comm'] == packet1['dst_ip']) or (complete_comm['src_comm'] == packet2['src_ip'] and complete_comm['dst_comm'] == packet2['dst_ip']):
+                            comm = complete_comm
+                            break
+                        else: 
+                            continue  
+                    
+                    if 'number_comm' not in comm:
+                        comm['number_comm'] = len(complete_comms) + 1
+                        comm['src_comm'] = packet1["src_ip"]
+                        comm['dst_comm'] = packet1["dst_ip"]
+                        comm['packets'] = []
+                    
+                comm['packets'].append(packet1)
+                comm['packets'].append(packet2)
+                passed_frame_numbers.append(packet1['frame_number'])
+                passed_frame_numbers.append(packet2['frame_number'])
+                complete_comms.append(comm)
+            
+            else:
+                
+        
 
-        # if we found reply, it means there is no pair for it so it goes to incomplete
-        if packet['arp_opcode'] == 'REPLY' or not pair:
-            comm['number_comm'] = len(incomplete_comms) + 1
-            comm['packets'] = []
-            comm['packets'].append(packet)
-            incomplete_comms.append(comm)
-        else:
-            comm['number_comm'] = len(complete_comms) + 1
-            comm['src_comm'] = packet['src_ip']
-            comm['dst_comm'] = packet['dst_ip']
-            comm['packets'] = []
-            comm['packets'].append(packet)
-            for req in requests:
-                comm['packets'].append(req)
-                arp_packets.remove(req)
-            comm['packets'].append(pair)
-            complete_comms.append(comm)
-
-            # remove packets from list of packets to prevent using them again by mistake
-            arp_packets.remove(pair)
-            arp_packets.remove(packet)
+        
 
     data = {
         'complete_comms': complete_comms,
-        'incomplete_comms': incomplete_comms
+        'partial_comms': partial_comms
     }
     return data
 
@@ -206,8 +207,9 @@ def getHexdump(hex):
 
     for i in range(0, math.ceil(len(hex)/16)):
 
-        hexCopy[0+(i*16)] = '\n'+hexCopy[0+(i*16)
-                                         ] if i != 0 else hexCopy[0+(i*16)]
+        hexCopy[0+(i*16)] = '\n'+hexCopy[0+(i*16)] 
+        
+        if i != 0 else hexCopy[0+(i*16)]
 
         if i == (len(hex)//16):
             frameParts.append(' '.join(hexCopy[0+(i*16):]))
