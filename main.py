@@ -9,7 +9,7 @@ import argparse
 
 
 def getFrameType(hex):
-    if (int(hex[12]+hex[13], 16) >= 1500):
+    if (int(hex[12]+hex[13], 16) >= 1536):
         return 'ETHERNET II'
 
     if ((hex[14]+hex[15]) == 'ffff'):
@@ -106,15 +106,22 @@ def analyzeArp(packets):
     arp_packets = list(
         filter(lambda packet: packet['ether_type'] == 'ARP', packets))
     # get only ARP packets
+
     for packet in arp_packets:
         comm = {}
         pair = {}
         requests = []
+
         for item in arp_packets:
-            if (packet['src_ip'] != item['src_ip'] and packet['dst_ip'] == item['dst_ip'] and packet['dst_mac'] == item['dst_mac'] and item['arp_opcode'] == 'REQUEST'):
+            if (packet['src_ip'] != item['src_ip'] and
+                packet['dst_ip'] == item['dst_ip'] and
+                    item['arp_opcode'] == 'REQUEST'):
                 requests.append(item)
 
-            if (item['src_ip'] == packet['dst_ip'] and packet['src_ip'] == item['dst_ip'] and packet['src_mac'] == item['dst_mac'] and item['arp_opcode'] == 'REPLY'):
+            if (item['src_ip'] == packet['dst_ip'] and
+                packet['src_ip'] == item['dst_ip'] and
+                packet['src_mac'] == item['dst_mac'] and
+                    item['arp_opcode'] == 'REPLY'):
                 pair = item
                 break
 
@@ -125,7 +132,7 @@ def analyzeArp(packets):
             comm['packets'].append(packet)
             incomplete_comms.append(comm)
         else:
-            comm['number_comm'] = len(incomplete_comms) + 1
+            comm['number_comm'] = len(complete_comms) + 1
             comm['src_comm'] = packet['src_ip']
             comm['dst_comm'] = packet['dst_ip']
             comm['packets'] = []
@@ -144,7 +151,6 @@ def analyzeArp(packets):
         'complete_comms': complete_comms,
         'incomplete_comms': incomplete_comms
     }
-    print(data)
     return data
 
 
