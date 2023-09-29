@@ -9,7 +9,7 @@ import argparse
 
 
 def getFrameType(hex):
-    if (int(hex[12]+hex[13], 16) >= 1536):
+    if (int(hex[12]+hex[13], 16) >= 1500):
         return 'ETHERNET II'
 
     if ((hex[14]+hex[15]) == 'ffff'):
@@ -99,6 +99,17 @@ def getPid(hex):
 
     return pids[hex]
 
+def commExists(comms,packet1, packet2):
+    for comm in comms:
+        if (comm['src_comm'] == packet1['src_ip'] and comm['dst_comm'] == packet1['dst_ip']) or (comm['src_comm'] == packet2['src_ip'] and comm['dst_comm'] == packet2['dst_ip']):
+            # we found matching comm
+            return comm
+        else: 
+            continue  
+    # comm doesn't exists yet 
+    return {}
+
+
 
 def analyzeArp(packets):
     complete_comms = []
@@ -111,7 +122,7 @@ def analyzeArp(packets):
     for packet1 in arp_packets:
 
         for packet2 in arp_packets:
-            if packet1['frame_number'] == packet2['frame_number']:
+            if packet1['frame_number'] == packet2['frame_number'] or packet1["frame_number"] in passed_frame_numbers:
                 continue
 
             if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
@@ -123,12 +134,7 @@ def analyzeArp(packets):
                     comm['packets'] = []
                    
                 else:
-                    for complete_comm in complete_comms:
-                        if (complete_comm['src_comm'] == packet1['src_ip'] and complete_comm['dst_comm'] == packet1['dst_ip']) or (complete_comm['src_comm'] == packet2['src_ip'] and complete_comm['dst_comm'] == packet2['dst_ip']):
-                            comm = complete_comm
-                            break
-                        else: 
-                            continue  
+                    comm = commExists(complete_comms, packet1, packet2)
                     
                     if 'number_comm' not in comm:
                         comm['number_comm'] = len(complete_comms) + 1
@@ -142,7 +148,9 @@ def analyzeArp(packets):
                 passed_frame_numbers.append(packet2['frame_number'])
                 complete_comms.append(comm)
             
-            else:
+            elif packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REQUEST':
+                comm = commExists(partial_comms, packet1, packet2)
+
                 
         
 
@@ -251,7 +259,7 @@ if __name__ == '__main__':
 
     # output header
     data = {
-        'name': 'PKS2022/23',
+        'name': 'PKS2023/24',
         'pcap_name': args.destination.split('/')[-1],
     }
 
