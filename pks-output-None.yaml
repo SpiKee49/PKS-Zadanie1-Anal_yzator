@@ -1,4 +1,4 @@
-name: PKS2022/23
+name: PKS2023/24
 pcap_name: trace-8.pcap
 packets:
   - frame_number: 1

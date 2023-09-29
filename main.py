@@ -99,16 +99,16 @@ def getPid(hex):
 
     return pids[hex]
 
-def commExists(comms,packet1, packet2):
+
+def commExists(comms, packet1, packet2):
     for comm in comms:
         if (comm['src_comm'] == packet1['src_ip'] and comm['dst_comm'] == packet1['dst_ip']) or (comm['src_comm'] == packet2['src_ip'] and comm['dst_comm'] == packet2['dst_ip']):
             # we found matching comm
             return comm
-        else: 
-            continue  
-    # comm doesn't exists yet 
+        else:
+            continue
+    # comm doesn't exists yet
     return {}
-
 
 
 def analyzeArp(packets):
@@ -121,8 +121,11 @@ def analyzeArp(packets):
 
     for packet1 in arp_packets:
 
+        if packet1["frame_number"] in passed_frame_numbers:
+            continue
+
         for packet2 in arp_packets:
-            if packet1['frame_number'] == packet2['frame_number'] or packet1["frame_number"] in passed_frame_numbers:
+            if packet1['frame_number'] == packet2['frame_number']:
                 continue
 
             if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
@@ -132,29 +135,39 @@ def analyzeArp(packets):
                     comm['src_comm'] = packet1["src_ip"]
                     comm['dst_comm'] = packet1["dst_ip"]
                     comm['packets'] = []
-                   
+
                 else:
                     comm = commExists(complete_comms, packet1, packet2)
-                    
+
                     if 'number_comm' not in comm:
                         comm['number_comm'] = len(complete_comms) + 1
                         comm['src_comm'] = packet1["src_ip"]
                         comm['dst_comm'] = packet1["dst_ip"]
                         comm['packets'] = []
-                    
+
                 comm['packets'].append(packet1)
                 comm['packets'].append(packet2)
                 passed_frame_numbers.append(packet1['frame_number'])
                 passed_frame_numbers.append(packet2['frame_number'])
                 complete_comms.append(comm)
-            
-            elif packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REQUEST':
-                comm = commExists(partial_comms, packet1, packet2)
 
-                
-        
+            else:
+                comm = commExists(partial_comms, packet1, packet1)
+                if len(partial_comms) == 0:
+                    comm['number_comm'] = 1
+                    comm['src_comm'] = packet1["src_ip"]
+                    comm['dst_comm'] = packet1["dst_ip"]
+                    comm['packets'] = []
 
-        
+                if 'number_comm' not in comm:
+                    comm['number_comm'] = len(partial_comms) + 1
+                    comm['src_comm'] = packet1["src_ip"]
+                    comm['dst_comm'] = packet1["dst_ip"]
+                    comm['packets'] = []
+
+                comm['packets'].append(packet1)
+                passed_frame_numbers.append(packet1['frame_number'])
+                partial_comms.append(comm)
 
     data = {
         'complete_comms': complete_comms,
@@ -215,9 +228,8 @@ def getHexdump(hex):
 
     for i in range(0, math.ceil(len(hex)/16)):
 
-        hexCopy[0+(i*16)] = '\n'+hexCopy[0+(i*16)] 
-        
-        if i != 0 else hexCopy[0+(i*16)]
+        hexCopy[0+(i*16)] = '\n'+hexCopy[0+(i*16)
+                                         ] if i != 0 else hexCopy[0+(i*16)]
 
         if i == (len(hex)//16):
             frameParts.append(' '.join(hexCopy[0+(i*16):]))
@@ -357,6 +369,7 @@ if __name__ == '__main__':
 
     f = open("pks-output-{}.yaml".format(args.protocol), "w")
     yaml = ruamel.yaml.YAML()
+    yaml.representer.ignore_aliases = lambda *args: True
     yaml.default_flow_style = False
     yaml.indent(mapping=2, sequence=4, offset=2)
     yaml.dump(data, f)
