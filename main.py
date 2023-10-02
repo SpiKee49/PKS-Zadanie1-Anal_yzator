@@ -307,14 +307,15 @@ if __name__ == '__main__':
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
                 pkt['protocol'] = getIpProtocol(int(hexDecoded[23], 16))
                 # find source ports with ihl to know we need to look for them
-                pkt['src_port'] = int(
-                    hexDecoded[14+ihl*4]+hexDecoded[14+ihl*4+1], 16)
-                pkt['dst_port'] = int(
-                    hexDecoded[14+ihl*4+2]+hexDecoded[14+ihl*4+3], 16)
-                # check to see if one of found ports is known port to protocol IPv4 protocol
-                if type(getAppProtocol(pkt['src_port'], pkt['protocol'])) == str or type(getAppProtocol(pkt['dst_port'], pkt['protocol'])) == str:
-                    pkt['app_protocol'] = getAppProtocol(pkt['src_port'], pkt['protocol']) if type(getAppProtocol(
-                        pkt['src_port'], pkt['protocol'])) == str else getAppProtocol(pkt['dst_port'], pkt['protocol'])
+                if pkt['protocol'] == 'UDP' or pkt['protocol'] == 'TCP':
+                    pkt['src_port'] = int(
+                        hexDecoded[14+ihl*4]+hexDecoded[14+ihl*4+1], 16)
+                    pkt['dst_port'] = int(
+                        hexDecoded[14+ihl*4+2]+hexDecoded[14+ihl*4+3], 16)
+                    # check to see if one of found ports is known port to protocol IPv4 protocol
+                    if type(getAppProtocol(pkt['src_port'], pkt['protocol'])) == str or type(getAppProtocol(pkt['dst_port'], pkt['protocol'])) == str:
+                        pkt['app_protocol'] = getAppProtocol(pkt['src_port'], pkt['protocol']) if type(getAppProtocol(
+                            pkt['src_port'], pkt['protocol'])) == str else getAppProtocol(pkt['dst_port'], pkt['protocol'])
                 # ipv4_senders counter
                 if pkt['src_ip'] in ip_send:
                     ip_send[pkt['src_ip']] += 1
