@@ -90,12 +90,8 @@ def getSap(hex):
 
 
 def getPid(hex):
-    pids = {
-        '2000': 'CDP',
-        '2004': 'DTP',
-        '010b': 'PVSTP+',
-        '809b': 'AppleTalk',
-    }
+    pid = open("./protocols/pids.json")
+    pids = json.load(pid)
 
     return pids[hex]
 
