@@ -51,7 +51,7 @@ def getIpProtocol(dec):
     try:
         return protocols[str(dec)]
     except:
-        return 'null'
+        return 'unknown'
 
 
 def getArpOp(dec):
@@ -86,14 +86,19 @@ def getSap(hex):
     sap = open("./protocols/saps.json")
     saps = json.load(sap)
 
-    return saps[hex]
+    try:
+        return saps[hex]
+    except:
+        return "unknown"
 
 
 def getPid(hex):
     pid = open("./protocols/pids.json")
     pids = json.load(pid)
-
-    return pids[hex]
+    try:
+        return pids[hex]
+    except:
+        return "unknown"
 
 
 def commExists(comms, packet1, packet2):
@@ -363,7 +368,10 @@ if __name__ == '__main__':
         # get ip with the most packets sent
         data['max_send_packets_by'].append(max(ip_send, key=ip_send.get))
 
-    f = open("pks-output-{}.yaml".format(args.protocol), "w")
+    if args.protocol:
+        f = open("pks-output-{}.yaml".format(args.protocol), "w")
+    else:
+        f = open("pks-output-all.yaml", "w")
     yaml = ruamel.yaml.YAML()
     yaml.representer.ignore_aliases = lambda *args: True
     yaml.default_flow_style = False
