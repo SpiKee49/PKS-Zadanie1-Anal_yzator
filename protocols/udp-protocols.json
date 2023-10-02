@@ -2,7 +2,7 @@
   "7": "ECHO",
   "19": "CHARGEN",
   "37": "TIME",
-  "53": "DOMAIN",
+  "53": "DNS",
   "67": "DHCP",
   "68": "DHCP",
   "69": "TFTP",

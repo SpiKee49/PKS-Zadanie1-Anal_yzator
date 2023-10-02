@@ -51,6 +51,7 @@ def getIpProtocol(dec):
     try:
         return protocols[str(dec)]
     except:
+        print("Uknown port: {}".format(dec))
         return 'unknown'
 
 
@@ -119,7 +120,6 @@ def analyzeArp(packets):
     arp_packets = list(
         filter(lambda packet: packet['ether_type'] == 'ARP', packets))
     # get only ARP packets
-
     for packet1 in arp_packets:
 
         if packet1["frame_number"] in passed_frame_numbers:
