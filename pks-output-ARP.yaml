@@ -1,261 +1,242 @@
 name: PKS2023/24
-pcap_name: trace-8.pcap
+pcap_name: trace-26.pcap
 filter_name: ARP
 complete_comms:
   - number_comm: 1
-    src_comm: 192.168.1.33
-    dst_comm: 192.168.1.1
+    src_comm: 10.20.30.1
+    dst_comm: 10.20.30.254
     packets:
-      - frame_number: 1
+      - frame_number: 41
         len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-      - frame_number: 2
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 42
         len_frame_pcap: 60
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
-        dst_mac: "00:14:38:06:E0:93"
+        src_mac: "00:16:47:02:24:40"
+        dst_mac: "00:10:18:33:CF:44"
         ether_type: ARP
         arp_opcode: REPLY
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
+        src_ip: 10.20.30.254
+        dst_ip: 10.20.30.1
         hexa_frame: |
-          00 14 38 06 e0 93 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 02 00 02 cf ab a2 4c c0 a8 01 01
-          00 14 38 06 e0 93 c0 a8 01 21 00 00 00 00 00 00
+          00 10 18 33 cf 44 00 16 47 02 24 40 08 06 00 01
+          08 00 06 04 00 02 00 16 47 02 24 40 0a 14 1e fe
+          00 10 18 33 cf 44 0a 14 1e 01 00 00 00 00 00 00
           00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 4
-        len_frame_pcap: 60
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
-        dst_mac: "FF:FF:FF:FF:FF:FF"
-        ether_type: ARP
-        arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
-        hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 5
-        len_frame_pcap: 42
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
-        dst_mac: "00:02:CF:AB:A2:4C"
-        ether_type: ARP
-        arp_opcode: REPLY
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
-        hexa_frame: |
-          00 02 cf ab a2 4c 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 02 00 14 38 06 e0 93 c0 a8 01 21
-          00 02 cf ab a2 4c c0 a8 01 01
-  - number_comm: 1
-    src_comm: 192.168.1.33
-    dst_comm: 192.168.1.1
-    packets:
-      - frame_number: 1
-        len_frame_pcap: 42
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
-        dst_mac: "FF:FF:FF:FF:FF:FF"
-        ether_type: ARP
-        arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
-        hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-      - frame_number: 2
-        len_frame_pcap: 60
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
-        dst_mac: "00:14:38:06:E0:93"
-        ether_type: ARP
-        arp_opcode: REPLY
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
-        hexa_frame: |
-          00 14 38 06 e0 93 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 02 00 02 cf ab a2 4c c0 a8 01 01
-          00 14 38 06 e0 93 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 4
-        len_frame_pcap: 60
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
-        dst_mac: "FF:FF:FF:FF:FF:FF"
-        ether_type: ARP
-        arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
-        hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 5
-        len_frame_pcap: 42
-        len_frame_medium: 64
-        frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
-        dst_mac: "00:02:CF:AB:A2:4C"
-        ether_type: ARP
-        arp_opcode: REPLY
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
-        hexa_frame: |
-          00 02 cf ab a2 4c 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 02 00 14 38 06 e0 93 c0 a8 01 21
-          00 02 cf ab a2 4c c0 a8 01 01
 partial_comms:
   - number_comm: 1
-    src_comm: 192.168.1.33
-    dst_comm: 192.168.1.1
+    src_comm: 0.0.0.0
+    dst_comm: 10.20.30.1
     packets:
-      - frame_number: 1
+      - frame_number: 94
         len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
+        src_ip: 0.0.0.0
+        dst_ip: 10.20.30.1
         hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-      - frame_number: 1
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 00 00 00 00
+          00 00 00 00 00 00 0a 14 1e 01
+      - frame_number: 96
         len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
+        src_ip: 0.0.0.0
+        dst_ip: 10.20.30.1
         hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-  - number_comm: 1
-    src_comm: 192.168.1.33
-    dst_comm: 192.168.1.1
-    packets:
-      - frame_number: 1
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 00 00 00 00
+          00 00 00 00 00 00 0a 14 1e 01
+      - frame_number: 107
         len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
+        src_ip: 0.0.0.0
+        dst_ip: 10.20.30.1
         hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-      - frame_number: 1
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 00 00 00 00
+          00 00 00 00 00 00 0a 14 1e 01
+  - number_comm: 2
+    src_comm: 10.20.30.1
+    dst_comm: 10.20.30.254
+    packets:
+      - frame_number: 95
         len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:14:38:06:E0:93"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.33
-        dst_ip: 192.168.1.1
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 14 38 06 e0 93 08 06 00 01
-          08 00 06 04 00 01 00 14 38 06 e0 93 c0 a8 01 21
-          00 00 00 00 00 00 c0 a8 01 01
-  - number_comm: 3
-    src_comm: 192.168.1.1
-    dst_comm: 192.168.1.33
-    packets:
-      - frame_number: 4
-        len_frame_pcap: 60
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 97
+        len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 4
-        len_frame_pcap: 60
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 108
+        len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-  - number_comm: 3
-    src_comm: 192.168.1.1
-    dst_comm: 192.168.1.33
-    packets:
-      - frame_number: 4
-        len_frame_pcap: 60
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 112
+        len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
-      - frame_number: 4
-        len_frame_pcap: 60
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 114
+        len_frame_pcap: 42
         len_frame_medium: 64
         frame_type: ETHERNET II
-        src_mac: "00:02:CF:AB:A2:4C"
+        src_mac: "00:10:18:33:CF:44"
         dst_mac: "FF:FF:FF:FF:FF:FF"
         ether_type: ARP
         arp_opcode: REQUEST
-        src_ip: 192.168.1.1
-        dst_ip: 192.168.1.33
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
         hexa_frame: |
-          ff ff ff ff ff ff 00 02 cf ab a2 4c 08 06 00 01
-          08 00 06 04 00 01 00 02 cf ab a2 4c c0 a8 01 01
-          00 00 00 00 00 00 c0 a8 01 21 00 00 00 00 00 00
-          00 00 00 00 00 00 00 00 00 00 00 00
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 125
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 135
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 148
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 149
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 158
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe
+      - frame_number: 166
+        len_frame_pcap: 42
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:10:18:33:CF:44"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 10.20.30.1
+        dst_ip: 10.20.30.254
+        hexa_frame: |
+          ff ff ff ff ff ff 00 10 18 33 cf 44 08 06 00 01
+          08 00 06 04 00 01 00 10 18 33 cf 44 0a 14 1e 01
+          00 00 00 00 00 00 0a 14 1e fe

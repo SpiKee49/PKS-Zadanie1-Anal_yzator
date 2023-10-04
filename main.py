@@ -123,52 +123,48 @@ def analyzeArp(packets):
     for packet1 in arp_packets:
 
         if packet1["frame_number"] in passed_frame_numbers:
+            print("Passing {}".format(packet1["frame_number"]))
             continue
 
         for packet2 in arp_packets:
-            if packet1['frame_number'] == packet2['frame_number']:
+            if packet1['frame_number'] == packet2['frame_number'] or packet2['frame_number'] in passed_frame_numbers:
+                print("Passing inside {}".format(packet2["frame_number"]))
                 continue
 
             if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
-                comm = {}
-                if len(complete_comms) == 0:
-                    comm['number_comm'] = 1
+                comm = commExists(complete_comms, packet1, packet2)
+
+                if 'number_comm' not in comm:
+                    comm['number_comm'] = 1 if len(
+                        complete_comms) < 0 and 'number_comm' not in comm else len(complete_comms) + 1
                     comm['src_comm'] = packet1["src_ip"]
                     comm['dst_comm'] = packet1["dst_ip"]
                     comm['packets'] = []
-
-                else:
-                    comm = commExists(complete_comms, packet1, packet2)
-
-                    if 'number_comm' not in comm:
-                        comm['number_comm'] = len(complete_comms) + 1
-                        comm['src_comm'] = packet1["src_ip"]
-                        comm['dst_comm'] = packet1["dst_ip"]
-                        comm['packets'] = []
 
                 comm['packets'].append(packet1)
                 comm['packets'].append(packet2)
                 passed_frame_numbers.append(packet1['frame_number'])
                 passed_frame_numbers.append(packet2['frame_number'])
-                complete_comms.append(comm)
+                if len(comm['packets']) == 2:
+                    complete_comms.append(comm)
+                break
 
-            else:
-                comm = commExists(partial_comms, packet1, packet1)
-                if len(partial_comms) == 0:
-                    comm['number_comm'] = 1
+            elif packet1['arp_opcode'] == packet2['arp_opcode'] and packet1['dst_ip'] == packet2['dst_ip'] and packet2['src_ip'] == packet1['src_ip']:
+                comm = commExists(partial_comms, packet1, packet2)
+
+                if 'packets' not in comm:
+                    comm['number_comm'] = 1 if len(
+                        partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
                     comm['src_comm'] = packet1["src_ip"]
                     comm['dst_comm'] = packet1["dst_ip"]
                     comm['packets'] = []
+                    comm['packets'].append(packet1)
+                    passed_frame_numbers.append(packet1['frame_number'])
 
-                if 'number_comm' not in comm:
-                    comm['number_comm'] = len(partial_comms) + 1
-                    comm['src_comm'] = packet1["src_ip"]
-                    comm['dst_comm'] = packet1["dst_ip"]
-                    comm['packets'] = []
-
-                comm['packets'].append(packet1)
-                passed_frame_numbers.append(packet1['frame_number'])
-                partial_comms.append(comm)
+                comm['packets'].append(packet2)
+                passed_frame_numbers.append(packet2['frame_number'])
+                if len(comm['packets']) == 2:
+                    partial_comms.append(comm)
 
     data = {
         'complete_comms': complete_comms,
