@@ -113,6 +113,11 @@ def commExists(comms, packet1, packet2):
     return {}
 
 
+def analyzeIcmp(packet):
+    icmp_packets = list(
+        filter(lambda packet: packet['ether_type'] == 'ICMP', packets))
+
+
 def analyzeArp(packets):
     complete_comms = []
     partial_comms = []
@@ -324,6 +329,12 @@ if __name__ == '__main__':
                 pkt['src_ip'] = getIp(hexDecoded[28:32])
                 pkt['dst_ip'] = getIp(hexDecoded[38:42])
 
+            elif 'ICMP' in pkt['ether_type']:
+                pkt['arp_opcode'] = getArpOp(
+                    int(hexDecoded[20]+hexDecoded[21], 16))
+                pkt['src_ip'] = getIp(hexDecoded[28:32])
+                pkt['dst_ip'] = getIp(hexDecoded[38:42])
+
         if 'LLC' in pkt['frame_type'] and not 'SNAP' in pkt['frame_type']:
             pkt['sap'] = getSap(hexDecoded[15])
 
@@ -343,6 +354,10 @@ if __name__ == '__main__':
         elif (args.protocol == 'ARP'):
             data['filter_name'] = 'ARP'
             data.update(analyzeArp(packets=list(
+                filter(lambda packet: packet['frame_type'] == 'ETHERNET II', packets))))
+        elif (args.protocol == ICMP):
+            data['filter_name'] = 'ICMP'
+            data.update(analyzeIcmp(packets=list(
                 filter(lambda packet: packet['frame_type'] == 'ETHERNET II', packets))))
         elif (args.protocol == 'RIP'):
             data.update(filterRip(packets=list(
