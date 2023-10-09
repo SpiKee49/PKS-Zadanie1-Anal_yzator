@@ -63,6 +63,16 @@ def getArpOp(dec):
     return arp_codes[dec]
 
 
+def getIcmpType(dec):
+    file = open("./protocols/icmp-types.json", "r")
+    types = json.load(file)
+    try:
+        return types[str(dec)]
+    except:
+        print("Uknown type: {}".format(dec))
+        return 'unknown'
+
+
 def getAppProtocol(dec, protocol):
 
     if 'UDP' in protocol:
@@ -113,9 +123,19 @@ def commExists(comms, packet1, packet2):
     return {}
 
 
-def analyzeIcmp(packet):
+def analyzeIcmp(packets):
+    complete_comms = []
+    partial_comms = []
+    passed_frame_numbers = []
     icmp_packets = list(
-        filter(lambda packet: packet['ether_type'] == 'ICMP', packets))
+        filter(lambda packet:  packet['protocol'] == 'ICMP', packets))
+
+    data = {
+        "complete_comms": complete_comms,
+        "partial_comms": partial_comms
+    }
+
+    return data
 
 
 def analyzeArp(packets):
@@ -316,6 +336,17 @@ if __name__ == '__main__':
                     if type(getAppProtocol(pkt['src_port'], pkt['protocol'])) == str or type(getAppProtocol(pkt['dst_port'], pkt['protocol'])) == str:
                         pkt['app_protocol'] = getAppProtocol(pkt['src_port'], pkt['protocol']) if type(getAppProtocol(
                             pkt['src_port'], pkt['protocol'])) == str else getAppProtocol(pkt['dst_port'], pkt['protocol'])
+
+                elif 'ICMP' == pkt['protocol']:
+                    pkt['icmp_type'] = getIcmpType(
+                        int(
+                            hexDecoded[14+ihl*4], 16))
+                    if pkt['icmp_type'] in ['ECHO REQUEST', 'ECHO REPLY']:
+                        pkt['icmp_id'] = int(
+                            hexDecoded[14+ihl*4+4]+hexDecoded[14+ihl*4+5], 16)
+                        pkt['icmp_seq'] = int(
+                            hexDecoded[14+ihl*4+6]+hexDecoded[14+ihl*4+7], 16)
+
                 # ipv4_senders counter
                 if pkt['src_ip'] in ip_send:
                     ip_send[pkt['src_ip']] += 1
@@ -323,12 +354,6 @@ if __name__ == '__main__':
                     ip_send[pkt['src_ip']] = 1
 
             elif 'ARP' in pkt['ether_type']:
-                pkt['arp_opcode'] = getArpOp(
-                    int(hexDecoded[20]+hexDecoded[21], 16))
-                pkt['src_ip'] = getIp(hexDecoded[28:32])
-                pkt['dst_ip'] = getIp(hexDecoded[38:42])
-
-            elif 'ICMP' in pkt['ether_type']:
                 pkt['arp_opcode'] = getArpOp(
                     int(hexDecoded[20]+hexDecoded[21], 16))
                 pkt['src_ip'] = getIp(hexDecoded[28:32])
@@ -354,10 +379,10 @@ if __name__ == '__main__':
             data['filter_name'] = 'ARP'
             data.update(analyzeArp(packets=list(
                 filter(lambda packet: packet['frame_type'] == 'ETHERNET II', packets))))
-        elif (args.protocol == ICMP):
+        elif (args.protocol == 'ICMP'):
             data['filter_name'] = 'ICMP'
             data.update(analyzeIcmp(packets=list(
-                filter(lambda packet: packet['frame_type'] == 'ETHERNET II', packets))))
+                filter(lambda packet: packet['frame_type'] == 'ETHERNET II' and packet['ether_type'] == 'IPv4', packets))))
         elif (args.protocol == 'RIP'):
             data.update(filterRip(packets=list(
                 filter(lambda packet: packet['frame_type'] == 'ETHERNET II', packets))))
