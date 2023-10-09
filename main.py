@@ -115,8 +115,16 @@ def getPid(hex):
 def commExists(comms, packet1, packet2):
     for comm in comms:
         if (comm['src_comm'] == packet1['src_ip'] and comm['dst_comm'] == packet1['dst_ip']) or (comm['src_comm'] == packet2['src_ip'] and comm['dst_comm'] == packet2['dst_ip']):
-            # we found matching comm
-            return comm
+            # we found matching comm but it is not ICMP
+            if "icmp_id" not in packet1 or packet1 == packet2:
+                return comm
+
+            # if it is ICMP we need to compare comms 'icmp_id' with 'icmp_id' of one of the packets, since pair has same 'icmp_id'
+            if comm['icmp_id'] == packet1['icmp_id']:
+                return comm
+            else:
+                continue
+
         else:
             continue
     # comm doesn't exists yet
@@ -129,6 +137,53 @@ def analyzeIcmp(packets):
     passed_frame_numbers = []
     icmp_packets = list(
         filter(lambda packet:  packet['protocol'] == 'ICMP', packets))
+
+    # get only ARP packets
+    for packet1 in icmp_packets:
+
+        # if we already passed the frame, we continue to next one
+        if packet1["frame_number"] in passed_frame_numbers:
+            continue
+
+        # go through all packages, except passed one's and find reply to request
+        for packet2 in icmp_packets:
+            if packet1['frame_number'] == packet2['frame_number'] or packet2['frame_number'] in passed_frame_numbers:
+                continue
+
+            if packet1['icmp_type'] == 'ECHO REQUEST' and packet2['icmp_type'] == 'ECHO REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip'] and packet1['icmp_id'] == packet2['icmp_id']:
+                comm = commExists(complete_comms, packet1, packet2)
+
+                if 'number_comm' not in comm:
+                    comm['number_comm'] = 1 if len(
+                        complete_comms) < 0 and 'number_comm' not in comm else len(complete_comms) + 1
+                    comm['src_comm'] = packet1["src_ip"]
+                    comm['dst_comm'] = packet1["dst_ip"]
+                    comm['icmp_id'] = packet1['imcp_id']
+                    comm['packets'] = []
+
+                comm['packets'].append(packet1)
+                comm['packets'].append(packet2)
+                passed_frame_numbers.append(packet1['frame_number'])
+                passed_frame_numbers.append(packet2['frame_number'])
+                if len(comm['packets']) == 2:
+                    complete_comms.append(comm)
+
+            else:
+                comm = commExists(partial_comms, packet1, packet1)
+
+                if 'packets' not in comm:
+                    comm['number_comm'] = 1 if len(
+                        partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
+                    comm['src_comm'] = packet1["src_ip"]
+                    comm['dst_comm'] = packet1["dst_ip"]
+                    comm['packets'] = []
+
+                comm['packets'].append(packet1)
+                passed_frame_numbers.append(packet1['frame_number'])
+
+                if len(comm['packets']) < 2:
+                    partial_comms.append(comm)
+            break
 
     data = {
         "complete_comms": complete_comms,
