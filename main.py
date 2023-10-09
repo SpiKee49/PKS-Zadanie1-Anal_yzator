@@ -122,13 +122,13 @@ def analyzeArp(packets):
     # get only ARP packets
     for packet1 in arp_packets:
 
+        # if we already passed the frame, we continue to next one
         if packet1["frame_number"] in passed_frame_numbers:
-            print("Passing {}".format(packet1["frame_number"]))
             continue
 
+        # go through all packages, except passed one's and find reply to request
         for packet2 in arp_packets:
             if packet1['frame_number'] == packet2['frame_number'] or packet2['frame_number'] in passed_frame_numbers:
-                print("Passing inside {}".format(packet2["frame_number"]))
                 continue
 
             if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
@@ -147,10 +147,9 @@ def analyzeArp(packets):
                 passed_frame_numbers.append(packet2['frame_number'])
                 if len(comm['packets']) == 2:
                     complete_comms.append(comm)
-                break
 
-            elif packet1['arp_opcode'] == packet2['arp_opcode'] and packet1['dst_ip'] == packet2['dst_ip'] and packet2['src_ip'] == packet1['src_ip']:
-                comm = commExists(partial_comms, packet1, packet2)
+            else:
+                comm = commExists(partial_comms, packet1, packet1)
 
                 if 'packets' not in comm:
                     comm['number_comm'] = 1 if len(
@@ -158,13 +157,13 @@ def analyzeArp(packets):
                     comm['src_comm'] = packet1["src_ip"]
                     comm['dst_comm'] = packet1["dst_ip"]
                     comm['packets'] = []
-                    comm['packets'].append(packet1)
-                    passed_frame_numbers.append(packet1['frame_number'])
 
-                comm['packets'].append(packet2)
-                passed_frame_numbers.append(packet2['frame_number'])
-                if len(comm['packets']) == 2:
+                comm['packets'].append(packet1)
+                passed_frame_numbers.append(packet1['frame_number'])
+
+                if len(comm['packets']) < 2:
                     partial_comms.append(comm)
+            break
 
     data = {
         'complete_comms': complete_comms,
@@ -370,7 +369,6 @@ if __name__ == '__main__':
     else:
         f = open("pks-output-all.yaml", "w")
     yaml = ruamel.yaml.YAML()
-    yaml.representer.ignore_aliases = lambda *args: True
     yaml.default_flow_style = False
     yaml.indent(mapping=2, sequence=4, offset=2)
     yaml.dump(data, f)
