@@ -18,6 +18,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 191
         hexa_frame: |
@@ -127,6 +128,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 191
         hexa_frame: |
@@ -236,6 +238,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 192
         hexa_frame: |
@@ -345,6 +348,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 192
         hexa_frame: |
@@ -454,6 +458,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 193
         hexa_frame: |
@@ -563,6 +568,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 193
         hexa_frame: |
@@ -672,6 +678,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 194
         hexa_frame: |
@@ -781,6 +788,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 194
         hexa_frame: |
@@ -890,6 +898,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 195
         hexa_frame: |
@@ -999,6 +1008,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 195
         hexa_frame: |
@@ -1108,6 +1118,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 196
         hexa_frame: |
@@ -1217,6 +1228,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 196
         hexa_frame: |
@@ -1326,6 +1338,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 197
         hexa_frame: |
@@ -1435,6 +1448,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 197
         hexa_frame: |
@@ -1544,6 +1558,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 198
         hexa_frame: |
@@ -1653,6 +1668,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 198
         hexa_frame: |
@@ -1762,6 +1778,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 199
         hexa_frame: |
@@ -1871,6 +1888,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 199
         hexa_frame: |
@@ -1980,6 +1998,7 @@ complete_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: ECHO REQUEST
+        flag: 1
         icmp_id: 1
         icmp_seq: 200
         hexa_frame: |
@@ -2089,6 +2108,7 @@ complete_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: ECHO REPLY
+        flag: 1
         icmp_id: 1
         icmp_seq: 200
         hexa_frame: |
@@ -2203,6 +2223,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 4d 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2286,6 +2307,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 4e 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2369,6 +2391,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 4f 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2452,6 +2475,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 50 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2535,6 +2559,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 52 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2618,6 +2643,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 53 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2701,6 +2727,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 54 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2784,6 +2811,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 55 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2867,6 +2895,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 56 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -2950,6 +2979,7 @@ partial_comms:
         dst_ip: 10.20.30.254
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 16 47 02 24 40 00 10 18 33 cf 44 08 00 45 00
           04 54 04 57 00 b9 80 01 00 00 0a 14 1e 01 0a 14
@@ -3037,6 +3067,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 4d 00 b9 ff 01 61 7c 0a 14 1e fe 0a 14
@@ -3120,6 +3151,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 4e 00 b9 ff 01 61 7b 0a 14 1e fe 0a 14
@@ -3203,6 +3235,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 4f 00 b9 ff 01 61 7a 0a 14 1e fe 0a 14
@@ -3286,6 +3319,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 50 00 b9 ff 01 61 79 0a 14 1e fe 0a 14
@@ -3369,6 +3403,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 52 00 b9 ff 01 61 77 0a 14 1e fe 0a 14
@@ -3452,6 +3487,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 53 00 b9 ff 01 61 76 0a 14 1e fe 0a 14
@@ -3535,6 +3571,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 54 00 b9 ff 01 61 75 0a 14 1e fe 0a 14
@@ -3618,6 +3655,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 55 00 b9 ff 01 61 74 0a 14 1e fe 0a 14
@@ -3701,6 +3739,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 56 00 b9 ff 01 61 73 0a 14 1e fe 0a 14
@@ -3784,6 +3823,7 @@ partial_comms:
         dst_ip: 10.20.30.1
         protocol: ICMP
         icmp_type: unknown
+        flag: 0
         hexa_frame: |
           00 10 18 33 cf 44 00 16 47 02 24 40 08 00 45 00
           04 54 04 57 00 b9 ff 01 61 72 0a 14 1e fe 0a 14

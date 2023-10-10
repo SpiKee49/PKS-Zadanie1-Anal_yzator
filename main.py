@@ -398,6 +398,7 @@ if __name__ == '__main__':
                     pkt['icmp_type'] = getIcmpType(
                         int(
                             hexDecoded[14+ihl*4], 16))
+                    pkt['flag'] = int(hexDecoded[20], 16) >> 5
                     if pkt['icmp_type'] in ['ECHO REQUEST', 'ECHO REPLY']:
                         pkt['icmp_id'] = int(
                             hexDecoded[14+ihl*4+4]+hexDecoded[14+ihl*4+5], 16)
