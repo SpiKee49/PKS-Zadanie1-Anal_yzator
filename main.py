@@ -138,7 +138,7 @@ def analyzeIcmp(packets):
     icmp_packets = list(
         filter(lambda packet:  packet['protocol'] == 'ICMP', packets))
 
-    # get only ARP packets
+    # get only ICMP packets
     for packet1 in icmp_packets:
 
         # if we already passed the frame, we continue to next one
@@ -169,22 +169,22 @@ def analyzeIcmp(packets):
                     complete_comms.append(comm)
                 break
 
-            if packet1["frame_number"] in passed_frame_numbers:
-                continue
+        if packet1["frame_number"] in passed_frame_numbers:
+            continue
 
-            comm = commExists(partial_comms, packet1, packet1)
-            if 'packets' not in comm:
-                comm['number_comm'] = 1 if len(
-                    partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
-                comm['src_comm'] = packet1["src_ip"]
-                comm['dst_comm'] = packet1["dst_ip"]
-                comm['packets'] = []
+        comm = commExists(partial_comms, packet1, packet1)
+        if 'packets' not in comm:
+            comm['number_comm'] = 1 if len(
+                partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
+            comm['src_comm'] = packet1["src_ip"]
+            comm['dst_comm'] = packet1["dst_ip"]
+            comm['packets'] = []
 
-            comm['packets'].append(packet1)
-            passed_frame_numbers.append(packet1['frame_number'])
+        comm['packets'].append(packet1)
+        passed_frame_numbers.append(packet1['frame_number'])
 
-            if len(comm['packets']) < 2:
-                partial_comms.append(comm)
+        if len(comm['packets']) < 2:
+            partial_comms.append(comm)
 
     data = {
         "complete_comms": complete_comms,
