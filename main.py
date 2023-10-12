@@ -150,7 +150,7 @@ def analyzeIcmp(packets):
             if packet1['frame_number'] == packet2['frame_number'] or packet2['frame_number'] in passed_frame_numbers:
                 continue
 
-            if packet1['icmp_type'] == 'ECHO REQUEST' and packet2['icmp_type'] == 'ECHO REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip'] and packet1['icmp_id'] == packet2['icmp_id']:
+            if packet1['icmp_type'] == 'ECHO REQUEST' and (packet2['icmp_type'] == 'ECHO REPLY' or packet2['icmp_type'] == 'TIME EXCEEDED') and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip'] and packet1['icmp_id'] == packet2['icmp_id']:
                 comm = commExists(complete_comms, packet1, packet2)
 
                 if 'number_comm' not in comm:
@@ -213,7 +213,7 @@ def analyzeArp(packets):
                 continue
 
             if packet1['arp_opcode'] == 'REQUEST' and packet2['arp_opcode'] == 'REPLY' and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip']:
-                comm = commExists(complete_comms, packet1, packet2)
+                comm = commExists(complete_comms, packet1, packet1)
 
                 if 'number_comm' not in comm:
                     comm['number_comm'] = 1 if len(
@@ -382,6 +382,13 @@ if __name__ == '__main__':
                 ihl = int(hexDecoded[14][1], 16)
                 pkt['src_ip'] = getIp(hexDecoded[26:30])
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
+                pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
+                flag_value = int(hexDecoded[20], 16) >> 5
+                if (flag_value == 1):  # this means packet is fragment
+                    pkt['flag_mf'] = True
+                    pkt['frag_offset'] = int(
+                        ''.join(hexDecoded[20:22]), 16) & (2**3-1)   # https://stackoverflow.com/a/74338975/19510795
+
                 pkt['protocol'] = getIpProtocol(int(hexDecoded[23], 16))
                 # find source ports with ihl to know we need to look for them
                 if pkt['protocol'] == 'UDP' or pkt['protocol'] == 'TCP':
@@ -398,8 +405,8 @@ if __name__ == '__main__':
                     pkt['icmp_type'] = getIcmpType(
                         int(
                             hexDecoded[14+ihl*4], 16))
-                    pkt['flag'] = int(hexDecoded[20], 16) >> 5
-                    if pkt['icmp_type'] in ['ECHO REQUEST', 'ECHO REPLY']:
+
+                    if pkt['icmp_type'] in ['ECHO REQUEST', 'ECHO REPLY', 'TIME EXCEEDED']:
                         pkt['icmp_id'] = int(
                             hexDecoded[14+ihl*4+4]+hexDecoded[14+ihl*4+5], 16)
                         pkt['icmp_seq'] = int(
