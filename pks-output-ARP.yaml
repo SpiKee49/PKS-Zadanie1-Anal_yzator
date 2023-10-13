@@ -5,7 +5,6 @@ complete_comms:
   - number_comm: 1
     src_comm: 128.238.38.160
     dst_comm: 128.238.38.1
-    searched_mac: "00:00:0C:07:AC:00"
     packets:
       - frame_number: 13
         len_frame_pcap: 42
@@ -301,4 +300,23 @@ partial_comms:
           ff ff ff ff ff ff 00 b0 8e 83 e4 54 08 06 00 01
           08 00 06 04 00 01 00 b0 8e 83 e4 54 80 ee 26 02
           00 00 00 00 00 00 80 ee 26 34 00 00 00 00 00 00
+          00 00 00 00 00 00 00 00 00 00 00 00
+  - number_comm: 11
+    src_comm: 128.238.38.2
+    dst_comm: 128.238.38.147
+    packets:
+      - frame_number: 35
+        len_frame_pcap: 60
+        len_frame_medium: 64
+        frame_type: ETHERNET II
+        src_mac: "00:B0:8E:83:E4:54"
+        dst_mac: "FF:FF:FF:FF:FF:FF"
+        ether_type: ARP
+        arp_opcode: REQUEST
+        src_ip: 128.238.38.2
+        dst_ip: 128.238.38.147
+        hexa_frame: |
+          ff ff ff ff ff ff 00 b0 8e 83 e4 54 08 06 00 01
+          08 00 06 04 00 01 00 b0 8e 83 e4 54 80 ee 26 02
+          00 00 00 00 00 00 80 ee 26 93 00 00 00 00 00 00
           00 00 00 00 00 00 00 00 00 00 00 00

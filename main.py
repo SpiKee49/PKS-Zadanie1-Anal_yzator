@@ -120,7 +120,7 @@ def commExists(comms, packet1, packet2):
                 return comm
 
             # if it is ICMP we need to compare comms 'icmp_id' with 'icmp_id' of one of the packets, since pair has same 'icmp_id'
-            if comm['icmp_id'] == packet1['icmp_id']:
+            if comm['icmp_id'] == packet1['icmp_id'] and comm['ip_id'] == packet1['id']:
                 return comm
             else:
                 continue
@@ -139,49 +139,91 @@ def analyzeIcmp(packets):
         filter(lambda packet:  packet['protocol'] == 'ICMP', packets))
 
     # get only ICMP packets
-    for packet1 in icmp_packets:
+    for request in icmp_packets:
 
         # if we already passed the frame, we continue to next one
-        if packet1["frame_number"] in passed_frame_numbers:
+        if request["frame_number"] in passed_frame_numbers:
             continue
 
         # go through all packages, except passed one's and find reply to request
-        for packet2 in icmp_packets:
-            if packet1['frame_number'] == packet2['frame_number'] or packet2['frame_number'] in passed_frame_numbers:
+        for reply in icmp_packets:
+            if request['frame_number'] == reply['frame_number'] or reply['frame_number'] in passed_frame_numbers:
                 continue
 
-            if packet1['icmp_type'] == 'ECHO REQUEST' and (packet2['icmp_type'] == 'ECHO REPLY' or packet2['icmp_type'] == 'TIME EXCEEDED') and packet1['dst_ip'] == packet2['src_ip'] and packet2['dst_ip'] == packet1['src_ip'] and packet1['icmp_id'] == packet2['icmp_id']:
-                comm = commExists(complete_comms, packet1, packet2)
+            if request['icmp_type'] == 'ECHO REQUEST' and (reply['icmp_type'] == 'ECHO REPLY' or reply['icmp_type'] == 'TIME EXCEEDED') and request['dst_ip'] == reply['src_ip'] and reply['dst_ip'] == request['src_ip'] and request['icmp_id'] == reply['icmp_id']:
+                comm = commExists(complete_comms, request, reply)
+                new_comm = False
 
-                if 'number_comm' not in comm:
+                if 'number_comm' not in comm:  # initializing new communication if it doesnt exist yet
+                    new_comm = True
                     comm['number_comm'] = 1 if len(
                         complete_comms) < 0 and 'number_comm' not in comm else len(complete_comms) + 1
-                    comm['src_comm'] = packet1["src_ip"]
-                    comm['dst_comm'] = packet1["dst_ip"]
-                    comm['icmp_id'] = packet1['icmp_id']
+                    comm['src_comm'] = request["src_ip"]
+                    comm['dst_comm'] = request["dst_ip"]
+                    comm['icmp_id'] = request['icmp_id']
+                    comm['ip_id'] = request['id']
                     comm['packets'] = []
 
-                comm['packets'].append(packet1)
-                comm['packets'].append(packet2)
-                passed_frame_numbers.append(packet1['frame_number'])
-                passed_frame_numbers.append(packet2['frame_number'])
-                if len(comm['packets']) == 2:
+                # now we need to find corensponding fragments to REQUEST
+                comm['packets'].append(request)
+                if 'flag_mf' in request:
+                    # filter all fragments except request, add packet info to last fragment and then remove info request, same goes for reply later
+                    fragments = sorted(list(filter(lambda packet: packet != request and 'flag_mf' in packet and packet['src_ip'] == request[
+                                       'src_ip'] and packet['dst_ip'] == request['dst_ip'] and packet['id'] == request['id'], icmp_packets)), key=lambda pkt: pkt['frame_number'])
+
+                    last_frag = fragments[-1]
+                    last_frag['protocol'] = request['protocol']
+                    last_frag['icmp_type'] = request['icmp_type']
+                    last_frag['icmp_id'] = request['icmp_id']
+                    last_frag['icmp_seq'] = request['icmp_seq']
+
+                    # remove packet info from first fragment
+                    for k in ['protocol', 'icmp_type', 'icmp_id', 'icmp_seq']:
+                        request.pop(k, None)
+                    # append fragments to comm
+                    for f in fragments:
+                        passed_frame_numbers.append(f['frame_number'])
+                        comm['packets'].append(f)
+
+                comm['packets'].append(reply)
+                if 'flag_mf' in reply:
+                    fragments = sorted(list(filter(lambda packet: packet != reply and 'flag_mf' in packet and packet['src_ip'] == reply[
+                                       'src_ip'] and packet['dst_ip'] == reply['dst_ip'] and packet['id'] == reply['id'], icmp_packets)), key=lambda pkt: pkt['frame_number'])
+
+                    last_frag = fragments[-1]
+                    last_frag['protocol'] = reply['protocol']
+                    last_frag['icmp_type'] = reply['icmp_type']
+                    last_frag['icmp_id'] = reply['icmp_id']
+                    last_frag['icmp_seq'] = reply['icmp_seq']
+
+                    # remove packet info from first fragment
+                    for k in ['protocol', 'icmp_type', 'icmp_id', 'icmp_seq']:
+                        reply.pop(k, None)
+                    # append fragments to comm
+                    for f in fragments:
+                        comm['packets'].append(f)
+                        passed_frame_numbers.append(f['frame_number'])
+
+                passed_frame_numbers.append(request['frame_number'])
+                passed_frame_numbers.append(reply['frame_number'])
+
+                if new_comm:  # appending only if the comm is new
                     complete_comms.append(comm)
                 break
 
-        if packet1["frame_number"] in passed_frame_numbers:
+        if request["frame_number"] in passed_frame_numbers:
             continue
 
-        comm = commExists(partial_comms, packet1, packet1)
+        comm = commExists(partial_comms, request, request)
         if 'packets' not in comm:
             comm['number_comm'] = 1 if len(
                 partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
-            comm['src_comm'] = packet1["src_ip"]
-            comm['dst_comm'] = packet1["dst_ip"]
+            comm['src_comm'] = request["src_ip"]
+            comm['dst_comm'] = request["dst_ip"]
             comm['packets'] = []
 
-        comm['packets'].append(packet1)
-        passed_frame_numbers.append(packet1['frame_number'])
+        comm['packets'].append(request)
+        passed_frame_numbers.append(request['frame_number'])
 
         if len(comm['packets']) < 2:
             partial_comms.append(comm)
@@ -383,11 +425,20 @@ if __name__ == '__main__':
                 pkt['src_ip'] = getIp(hexDecoded[26:30])
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
                 pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
+
+                # Fragments checks
                 flag_value = int(hexDecoded[20], 16) >> 5
+                offset = int(
+                    ''.join(hexDecoded[20:22]), 16) & (2**3-1)  # https://stackoverflow.com/a/74338975/19510795
+
                 if (flag_value == 1):  # this means packet is fragment
                     pkt['flag_mf'] = True
-                    pkt['frag_offset'] = int(
-                        ''.join(hexDecoded[20:22]), 16) & (2**3-1)   # https://stackoverflow.com/a/74338975/19510795
+                    pkt['frag_offset'] = offset
+                elif (flag_value == 0 and offset > 0):
+                    pkt['flag_mf'] = False
+                    pkt['frag_offset'] = offset
+
+                ###
 
                 pkt['protocol'] = getIpProtocol(int(hexDecoded[23], 16))
                 # find source ports with ihl to know we need to look for them
@@ -411,6 +462,11 @@ if __name__ == '__main__':
                             hexDecoded[14+ihl*4+4]+hexDecoded[14+ihl*4+5], 16)
                         pkt['icmp_seq'] = int(
                             hexDecoded[14+ihl*4+6]+hexDecoded[14+ihl*4+7], 16)
+
+                    # predefine dict keys to be filled in last fragment
+                    if flag_value == 0 and offset > 0:
+                        pkt['icmp_id'] = ''
+                        pkt['icmp_seq'] = ''
 
                 # ipv4_senders counter
                 if pkt['src_ip'] in ip_send:
