@@ -112,15 +112,15 @@ def getPid(hex):
         return "unknown"
 
 
-def commExists(comms, packet1, packet2):
+def commExists(comms, packet1, packet2, is_icmp=False):
     for comm in comms:
         if (comm['src_comm'] == packet1['src_ip'] and comm['dst_comm'] == packet1['dst_ip']) or (comm['src_comm'] == packet2['src_ip'] and comm['dst_comm'] == packet2['dst_ip']):
             # we found matching comm but it is not ICMP
-            if "icmp_id" not in packet1 or packet1 == packet2:
+            if not is_icmp:
                 return comm
 
             # if it is ICMP we need to compare comms 'icmp_id' with 'icmp_id' of one of the packets, since pair has same 'icmp_id'
-            if comm['icmp_id'] == packet1['icmp_id'] and comm['ip_id'] == packet1['id']:
+            if is_icmp and comm['icmp_id'] == packet1['icmp_id'] or ('id' in comm['packets'][0] and len(list(filter(lambda packet: 'id' in packet and (('id' in packet1['id'] and packet['id'] == packet1['id'])), comm['packets']))) > 0):
                 return comm
             else:
                 continue
@@ -129,6 +129,36 @@ def commExists(comms, packet1, packet2):
             continue
     # comm doesn't exists yet
     return {}
+
+
+def initialize_comm(comm, comms, packet, is_icmp=False):
+    comm['number_comm'] = 1 if len(
+        comms) < 0 and 'number_comm' not in comm else len(comms) + 1
+    comm['src_comm'] = packet["src_ip"]
+    comm['dst_comm'] = packet["dst_ip"]
+    if is_icmp:
+        comm['icmp_id'] = packet['icmp_id']
+    comm['packets'] = []
+
+
+def find_fragments(comm, icmp_packets, current_packet, passed_frame_numbers):
+    # filter all fragments except current_packet, add packet info to last fragment and then remove info from current_packet, same goes for reply later
+    fragments = sorted(list(filter(lambda packet: packet != current_packet and 'flag_mf' in packet and packet['src_ip'] == current_packet[
+                       'src_ip'] and packet['dst_ip'] == current_packet['dst_ip'] and packet['id'] == current_packet['id'], icmp_packets)), key=lambda pkt: pkt['frame_number'])
+
+    last_frag = fragments[-1]
+    last_frag['protocol'] = current_packet['protocol']
+    last_frag['icmp_type'] = current_packet['icmp_type']
+    last_frag['icmp_id'] = current_packet['icmp_id']
+    last_frag['icmp_seq'] = current_packet['icmp_seq']
+
+    # remove packet info from first fragment
+    for k in ['protocol', 'icmp_type', 'icmp_id', 'icmp_seq']:
+        current_packet.pop(k, None)
+    # append fragments to comm
+    for f in fragments:
+        passed_frame_numbers.append(f['frame_number'])
+        comm['packets'].append(f)
 
 
 def analyzeIcmp(packets):
@@ -150,59 +180,24 @@ def analyzeIcmp(packets):
             if request['frame_number'] == reply['frame_number'] or reply['frame_number'] in passed_frame_numbers:
                 continue
 
-            if request['icmp_type'] == 'ECHO REQUEST' and (reply['icmp_type'] == 'ECHO REPLY' or reply['icmp_type'] == 'TIME EXCEEDED') and request['dst_ip'] == reply['src_ip'] and reply['dst_ip'] == request['src_ip'] and request['icmp_id'] == reply['icmp_id']:
-                comm = commExists(complete_comms, request, reply)
+            if request['icmp_type'] == 'ECHO REQUEST' and ((reply['icmp_type'] == 'ECHO REPLY' and request['icmp_id'] == reply['icmp_id'] and request['dst_ip'] == reply['src_ip']) or reply['icmp_type'] == 'TIME EXCEEDED') and reply['dst_ip'] == request['src_ip']:
+                comm = commExists(complete_comms, request, reply, is_icmp=True)
                 new_comm = False
 
                 if 'number_comm' not in comm:  # initializing new communication if it doesnt exist yet
                     new_comm = True
-                    comm['number_comm'] = 1 if len(
-                        complete_comms) < 0 and 'number_comm' not in comm else len(complete_comms) + 1
-                    comm['src_comm'] = request["src_ip"]
-                    comm['dst_comm'] = request["dst_ip"]
-                    comm['icmp_id'] = request['icmp_id']
-                    comm['ip_id'] = request['id']
-                    comm['packets'] = []
+                    initialize_comm(comm, complete_comms, request, True)
 
-                # now we need to find corensponding fragments to REQUEST
                 comm['packets'].append(request)
+                # now we need to find corensponding fragments to REQUEST
                 if 'flag_mf' in request:
-                    # filter all fragments except request, add packet info to last fragment and then remove info request, same goes for reply later
-                    fragments = sorted(list(filter(lambda packet: packet != request and 'flag_mf' in packet and packet['src_ip'] == request[
-                                       'src_ip'] and packet['dst_ip'] == request['dst_ip'] and packet['id'] == request['id'], icmp_packets)), key=lambda pkt: pkt['frame_number'])
-
-                    last_frag = fragments[-1]
-                    last_frag['protocol'] = request['protocol']
-                    last_frag['icmp_type'] = request['icmp_type']
-                    last_frag['icmp_id'] = request['icmp_id']
-                    last_frag['icmp_seq'] = request['icmp_seq']
-
-                    # remove packet info from first fragment
-                    for k in ['protocol', 'icmp_type', 'icmp_id', 'icmp_seq']:
-                        request.pop(k, None)
-                    # append fragments to comm
-                    for f in fragments:
-                        passed_frame_numbers.append(f['frame_number'])
-                        comm['packets'].append(f)
+                    find_fragments(comm, icmp_packets,
+                                   request, passed_frame_numbers)
 
                 comm['packets'].append(reply)
                 if 'flag_mf' in reply:
-                    fragments = sorted(list(filter(lambda packet: packet != reply and 'flag_mf' in packet and packet['src_ip'] == reply[
-                                       'src_ip'] and packet['dst_ip'] == reply['dst_ip'] and packet['id'] == reply['id'], icmp_packets)), key=lambda pkt: pkt['frame_number'])
-
-                    last_frag = fragments[-1]
-                    last_frag['protocol'] = reply['protocol']
-                    last_frag['icmp_type'] = reply['icmp_type']
-                    last_frag['icmp_id'] = reply['icmp_id']
-                    last_frag['icmp_seq'] = reply['icmp_seq']
-
-                    # remove packet info from first fragment
-                    for k in ['protocol', 'icmp_type', 'icmp_id', 'icmp_seq']:
-                        reply.pop(k, None)
-                    # append fragments to comm
-                    for f in fragments:
-                        comm['packets'].append(f)
-                        passed_frame_numbers.append(f['frame_number'])
+                    find_fragments(comm, icmp_packets,
+                                   reply, passed_frame_numbers)
 
                 passed_frame_numbers.append(request['frame_number'])
                 passed_frame_numbers.append(reply['frame_number'])
@@ -215,6 +210,7 @@ def analyzeIcmp(packets):
             continue
 
         comm = commExists(partial_comms, request, request)
+
         if 'packets' not in comm:
             comm['number_comm'] = 1 if len(
                 partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
@@ -258,11 +254,7 @@ def analyzeArp(packets):
                 comm = commExists(complete_comms, packet1, packet1)
 
                 if 'number_comm' not in comm:
-                    comm['number_comm'] = 1 if len(
-                        complete_comms) < 0 and 'number_comm' not in comm else len(complete_comms) + 1
-                    comm['src_comm'] = packet1["src_ip"]
-                    comm['dst_comm'] = packet1["dst_ip"]
-                    comm['packets'] = []
+                    initialize_comm(comm, complete_comms, packet1)
 
                 comm['packets'].append(packet1)
                 comm['packets'].append(packet2)
@@ -277,11 +269,7 @@ def analyzeArp(packets):
 
         comm = commExists(partial_comms, packet1, packet1)
         if 'packets' not in comm:
-            comm['number_comm'] = 1 if len(
-                partial_comms) < 0 and 'number_comm' not in comm else len(partial_comms) + 1
-            comm['src_comm'] = packet1["src_ip"]
-            comm['dst_comm'] = packet1["dst_ip"]
-            comm['packets'] = []
+            initialize_comm(comm, partial_comms, packet1)
 
         comm['packets'].append(packet1)
         passed_frame_numbers.append(packet1['frame_number'])
@@ -428,8 +416,8 @@ if __name__ == '__main__':
 
                 # Fragments checks
                 flag_value = int(hexDecoded[20], 16) >> 5
-                offset = int(
-                    ''.join(hexDecoded[20:22]), 16) & (2**3-1)  # https://stackoverflow.com/a/74338975/19510795
+                offset = (int(hexDecoded[20] +
+                              hexDecoded[21], 16) & 0b0001111111111111) * 8
 
                 if (flag_value == 1):  # this means packet is fragment
                     pkt['flag_mf'] = True
