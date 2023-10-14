@@ -120,7 +120,8 @@ def commExists(comms, packet1, packet2, is_icmp=False):
                 return comm
 
             # if it is ICMP we need to compare comms 'icmp_id' with 'icmp_id' of one of the packets, since pair has same 'icmp_id'
-            if is_icmp and comm['icmp_id'] == packet1['icmp_id'] or ('id' in comm['packets'][0] and len(list(filter(lambda packet: 'id' in packet and (('id' in packet1['id'] and packet['id'] == packet1['id'])), comm['packets']))) > 0):
+            # comm['icmp_id'] == packet1['icmp_id'] or
+            if is_icmp and (len(list(filter(lambda packet: 'id' in packet and (('id' in packet1 and packet['id'] == packet1['id'])), comm['packets']))) > 0):
                 return comm
             else:
                 continue
