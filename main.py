@@ -286,47 +286,70 @@ def analyzeArp(packets):
 
 
 def analyzeTftp(packets):
-    comms = []
+    complete_comms = []
     # get only UDP packets
     udp_packets = list(filter(
         lambda packet: packet['ether_type'] == 'IPv4' and packet['protocol'] == 'UDP', packets))
 
+    passed_frames = []
     for packet in udp_packets:
         comm = {}
         # find packet with port of TFTP com. start point
+        if packet['frame_number'] in passed_frames:
+            continue
+
         if packet['dst_port'] == 69:
             # format new communication header
-            comm['number_comm'] = len(comms) + 1
+            comm['number_comm'] = len(complete_comms) + 1
             comm['src_comm'] = packet['src_ip']
             comm['dst_comm'] = packet['dst_ip']
             comm['packets'] = []
             comm['packets'].append(packet)
-            udp_packets.remove(packet)
+            passed_frames.append(packet['frame_number'])
 
             for pair in udp_packets:
+                if pair['frame_number'] in passed_frames:
+                    continue
                 # find packet responding to first packets source IP
                 if pair['dst_port'] == packet['src_port'] and packet['src_ip'] == pair['dst_ip'] and packet['dst_ip'] == pair['src_ip']:
                     comm['packets'].append(pair)
-                    udp_packets.remove(pair)
+                    passed_frames.append(pair['frame_number'])
                     flip = False
                     # cycle the rest of the packets to find all remaining packets of communication when we know the source and dest ports
                     for rest in udp_packets:
+                        if rest['frame_number'] in passed_frames:
+                            continue
                         # if statements to handle if we looking for req or respond
                         if (not flip and pair['dst_port'] == rest['src_port'] and rest['src_ip'] == pair['dst_ip'] and rest['dst_ip'] == pair['src_ip']):
                             comm['packets'].append(rest)
-                            udp_packets.remove(rest)
+                            passed_frames.append(rest['frame_number'])
                             flip = True
 
                         if (flip and pair['src_port'] == rest['src_port'] and rest['src_ip'] == pair['src_ip'] and rest['dst_ip'] == pair['dst_ip']):
                             comm['packets'].append(rest)
-                            udp_packets.remove(rest)
+                            passed_frames.append(rest['frame_number'])
                             flip = False
 
-        if comm:
-            comms.append(comm)
+                        # ended comm with error
+                        if (int(''.join(rest['hexa_frame'].split()[42:44]), 16) == 5):
+                            if rest['frame_number'] not in passed_frames:
+                                comm['packets'].append(rest)
+                                passed_frames.append(rest['frame_number'])
+                            break
+
+                if comm and len(comm['packets']) > 1:
+                    hexDecoded = comm['packets'][-1]['hexa_frame'].split()
+                    hexDecoded2 = comm['packets'][-1]['hexa_frame'].split()
+                    op_code = int(
+                        hexDecoded[42]+hexDecoded[43], 16)
+                    if op_code == 5:
+                        complete_comms.append(comm)
+                    elif op_code == 4 and len(hexDecoded2[46:]) < 512:
+                        complete_comms.append(comm)
+                    break
 
     data = {
-        'comms': comms
+        'complete_comms': complete_comms
     }
     return data
 
@@ -394,7 +417,7 @@ if __name__ == '__main__':
         if ''.join(hexDecoded[0:6]) == "01000c000000" or ''.join(hexDecoded[0:6]) == "03000c000000":
             hexDecoded = hexDecoded[26:-1]
 
-        # create package dictionary to store all information
+        # create packet dictionary to store all information
         pkt = {
             'frame_number': idx,
             'len_frame_pcap': len(hexDecoded),
@@ -413,7 +436,6 @@ if __name__ == '__main__':
                 ihl = int(hexDecoded[14][1], 16)
                 pkt['src_ip'] = getIp(hexDecoded[26:30])
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
-                pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
 
                 # Fragments checks
                 flag_value = int(hexDecoded[20], 16) >> 5
@@ -421,9 +443,11 @@ if __name__ == '__main__':
                               hexDecoded[21], 16) & 0b0001111111111111) * 8
 
                 if (flag_value == 1):  # this means packet is fragment
+                    pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
                     pkt['flag_mf'] = True
                     pkt['frag_offset'] = offset
                 elif (flag_value == 0 and offset > 0):
+                    pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
                     pkt['flag_mf'] = False
                     pkt['frag_offset'] = offset
 
@@ -514,10 +538,8 @@ if __name__ == '__main__':
         # get ip with the most packets sent
         data['max_send_packets_by'].append(max(ip_send, key=ip_send.get))
 
-    if args.protocol:
-        f = open("pks-output-{}.yaml".format(args.protocol), "w")
-    else:
-        f = open("pks-output-all.yaml", "w")
+    f = open(
+        "pks-output-{}.yaml".format(args.protocol if args.protocol else 'all'), "w")
     yaml = ruamel.yaml.YAML()
     yaml.default_flow_style = False
     yaml.indent(mapping=2, sequence=4, offset=2)
