@@ -225,6 +225,14 @@ def analyzeIcmp(packets):
         if len(comm['packets']) < 2:
             partial_comms.append(comm)
 
+    for comm in complete_comms:
+        if 'icmp_id' in comm:
+            del comm['icmp_id']
+
+    for comm in partial_comms:
+        if 'icmp_id' in comm:
+            del comm['icmp_id']
+
     data = {
         "complete_comms": complete_comms,
         "partial_comms": partial_comms
@@ -339,7 +347,7 @@ def analyzeTftp(packets):
 
                 if comm and len(comm['packets']) > 1:
                     hexDecoded = comm['packets'][-1]['hexa_frame'].split()
-                    hexDecoded2 = comm['packets'][-1]['hexa_frame'].split()
+                    hexDecoded2 = comm['packets'][-2]['hexa_frame'].split()
                     op_code = int(
                         hexDecoded[42]+hexDecoded[43], 16)
                     if op_code == 5:
@@ -436,6 +444,7 @@ if __name__ == '__main__':
                 ihl = int(hexDecoded[14][1], 16)
                 pkt['src_ip'] = getIp(hexDecoded[26:30])
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
+                pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
 
                 # Fragments checks
                 flag_value = int(hexDecoded[20], 16) >> 5
