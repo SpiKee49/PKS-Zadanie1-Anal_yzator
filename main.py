@@ -316,7 +316,7 @@ def analyzeTftp(packets):
             passed_frames.append(packet['frame_number'])
 
             for pair in udp_packets:
-                if pair['frame_number'] in passed_frames:
+                if pair['frame_number'] in passed_frames or pair["frame_number"] <= packet['frame_number']:
                     continue
                 # find packet responding to first packets source IP
                 if pair['dst_port'] == packet['src_port'] and packet['src_ip'] == pair['dst_ip'] and packet['dst_ip'] == pair['src_ip']:
@@ -325,7 +325,7 @@ def analyzeTftp(packets):
                     flip = False
                     # cycle the rest of the packets to find all remaining packets of communication when we know the source and dest ports
                     for rest in udp_packets:
-                        if rest['frame_number'] in passed_frames:
+                        if rest['frame_number'] in passed_frames or rest["frame_number"] <= pair['frame_number']:
                             continue
                         # if statements to handle if we looking for req or respond
                         if (not flip and pair['dst_port'] == rest['src_port'] and rest['src_ip'] == pair['dst_ip'] and rest['dst_ip'] == pair['src_ip']):
@@ -444,7 +444,6 @@ if __name__ == '__main__':
                 ihl = int(hexDecoded[14][1], 16)
                 pkt['src_ip'] = getIp(hexDecoded[26:30])
                 pkt['dst_ip'] = getIp(hexDecoded[30:34])
-                pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
 
                 # Fragments checks
                 flag_value = int(hexDecoded[20], 16) >> 5
