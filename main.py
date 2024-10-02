@@ -450,7 +450,7 @@ if __name__ == '__main__':
                 offset = (int(hexDecoded[20] +
                               hexDecoded[21], 16) & 0b0001111111111111) * 8
 
-                if (flag_value == 1):  # this means packet is fragment
+                if (flag_value in [1, 3]):  # this means packet is fragment
                     pkt['id'] = int(''.join(hexDecoded[18:20]), 16)
                     pkt['flag_mf'] = True
                     pkt['frag_offset'] = offset
